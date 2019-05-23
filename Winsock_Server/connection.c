@@ -89,7 +89,9 @@ DWORD WINAPI echo_handler(void* _sock)
 {
     SOCKET sock = (SOCKET)_sock;
     echo(sock);
-    shutdown(sock, SD_SEND);
+    if(shutdown(sock, SD_SEND) == SOCKET_ERROR ) {
+        printf("Shutdown failed!\n");
+    }
     return 0;
 }
 
@@ -101,6 +103,9 @@ uint8_t echo(SOCKET client)
     do {
         byte_rec = recv(client, receive_buffer, received_len, 0);
         if (byte_rec > 0) {
+            if(strcmp(receive_buffer, "--exit") == 0) {
+                break;
+            }
             printf("Bytes received: %d\n", byte_rec);
             printf("\t\"%s\"\n", receive_buffer);
 
@@ -111,11 +116,13 @@ uint8_t echo(SOCKET client)
                 return 0;
             }
         } else if (byte_rec == 0) {
-            printf("Connection closing...\n");
+            break;
         } else {
+            printf("Force close!\n");
             closesocket(client);
             return 1;
         }
     } while (byte_rec > 0);
+    printf("Connection closing...\n");
     return 1;
 }
