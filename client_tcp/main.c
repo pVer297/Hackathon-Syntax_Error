@@ -7,9 +7,8 @@
 #pragma comment(lib, "ws2_32.lib");
 
 #define DEFAULT_BUFLEN 256
-
-#define IP_ADDRESS "10.27.6.127"
-#define PORT 54000
+#define IP_ADDRESS "10.27.6.113"
+#define PORT 27015
 
 int main()
 {
