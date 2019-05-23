@@ -1,7 +1,9 @@
-#include "win_socket2019.h"
+#include "plainte_socket2019.h"
+#include "time.h"
 
 int main()
 {
+    srand(time(0));
     // Declare and initialize variables
     // Initialize Winsock
     if(!start_wsa()) {
