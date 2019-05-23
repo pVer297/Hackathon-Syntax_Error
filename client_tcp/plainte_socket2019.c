@@ -60,31 +60,30 @@ int send_and_receive_data(SOCKET socket)
         gets(user_input);
         // Make sure the user typed in something
         if (strlen(user_input) > 0) {
-            if (strlen(user_input) == strlen("exit")) {
-                if (stricmp(user_input, "exit") == 0 || stricmp(user_input, "stop") == 0) {
-                    char c[5];
-                    printf("Would you like to exit? (press Y or N /or ignore/)\n");
-                    gets(c);
-                    if (stricmp(c, "y") == 0 || stricmp(c, "yes") == 0) {
-                        return 0;
-                    } else if (stricmp(c, "n") == 0 || stricmp(c, "no") == 0) {
-                        int a = rand() % 3;
-                        switch (a) {
-                            case 0:
-                                printf("Tip: you can always be happy! :)\n");
-                                break;
-                            case 1:
-                                printf("Generating terrain...\n");
-                                break;
-                            case 2:
-                                printf("Error 404: Joke Not Found\n");
-                            default:
-                                printf("Activating Witch Time...\n");
-                                break;
-                        }
-                        printf("%s> ", usr_name);
-                        gets(user_input);
+            while (stricmp(user_input, "exit") == 0 || stricmp(user_input, "stop") == 0) {
+                char c[5];
+                printf("Would you like to exit? (press Y or N /or ignore/)\n");
+                gets(c);
+                if (stricmp(c, "y") == 0 || stricmp(c, "yes") == 0) {
+                    return 0;
+                } else if (stricmp(c, "n") == 0 || stricmp(c, "no") == 0) {
+                    int a = rand() % 3;
+                    switch (a) {
+                        case 0:
+                            printf("Tip: you can always be happy! :)\n");
+                            break;
+                        case 1:
+                            printf("Generating terrain...\n");
+                            break;
+                        case 2:
+                            printf("Error 404: Joke Not Found\n");
+                            break;
+                        default:
+                            printf("Activating Witch Time...\n");
+                            break;
                     }
+                    printf("%s> ", usr_name);
+                    gets(user_input);
                 }
             }
             // Send message to srv
