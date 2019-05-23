@@ -23,37 +23,44 @@ int main()
     freeaddrinfo(result);
 
     SOCKET client_socket;
-    if(!connect_client(&server_socket, &client_socket)) {
-        return 1;
-    }
+    uint8_t stop_flag = 0;
 
-    char recieve_buffer[BUFF_LEN];
-    int recieved_len = BUFF_LEN;
-    int byte_rec = 0;
-    do {
-        byte_rec = recv(client_socket, recieve_buffer, recieved_len, 0);
-        if (byte_rec > 0) {
-            printf("Bytes recieved: %d\n", byte_rec);
-
-            int send_result = send(client_socket, recieve_buffer, byte_rec, 0);
-            if (send_result == SOCKET_ERROR) {
-                printf("Send failed. Error: %d\n", WSAGetLastError());
-                closesocket(server_socket);
-                closesocket(client_socket);
-                WSACleanup();
-                return 1;
-            }
-        } else if (byte_rec == 0) {
-            printf("Connection closing...\n");
-        } else {
-            printf("Recieve failed. Error: %d\n", WSAGetLastError());
-            closesocket(server_socket);
-            closesocket(client_socket);
-            WSACleanup();
+    for (;;) {
+        if (!connect_client(&server_socket, &client_socket)) {
             return 1;
         }
 
-    } while (byte_rec > 0);
+        char receive_buffer[BUFF_LEN];
+        int received_len = BUFF_LEN;
+        int byte_rec = 0;
+        do {
+            byte_rec = recv(client_socket, receive_buffer, received_len, 0);
+            if (byte_rec > 0) {
+                printf("Bytes received: %d\n", byte_rec);
+                printf("\t\"%s\"\n", receive_buffer);
+                if(strcmp(receive_buffer, "stop") == 0) {
+                    stop_flag = 1;
+                    break;
+                }
+
+                int send_result = send(client_socket, receive_buffer, byte_rec, 0);
+                if (send_result == SOCKET_ERROR) {
+                    printf("Send failed. Error: %d\n", WSAGetLastError());
+                    closesocket(client_socket);
+                    break;
+                }
+            } else if (byte_rec == 0) {
+                printf("Connection closing...\n");
+            } else {
+                closesocket(client_socket);
+                break;
+            }
+
+        } while (byte_rec > 0);
+        if(stop_flag == 1) {
+            break;
+        }
+    }
 
     error = shutdown(client_socket, SD_SEND);
     if (error == SOCKET_ERROR) {
@@ -64,6 +71,7 @@ int main()
     }
 
     puts("Exit");
+    closesocket(server_socket);
     closesocket(client_socket);
     WSACleanup();
     return 0;
