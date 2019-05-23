@@ -13,6 +13,7 @@
 #define IP_ADDRESS "10.27.6.113"
 #define PORT 47698
 
+int create_client();
 int create_socket(SOCKET socket);
 int start_wsa();
 int connect_sck(SOCKET socket, struct sockaddr_in client);
