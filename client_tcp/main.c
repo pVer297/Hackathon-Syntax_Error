@@ -8,7 +8,7 @@
 
 #define DEFAULT_BUFLEN 256
 #define IP_ADDRESS "10.27.6.113"
-#define PORT 27015
+#define PORT 80
 
 int main()
 {

@@ -3,7 +3,7 @@ project(Winsock_Server C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(Winsock_Server main.c)
+add_executable(Winsock_Server main.c connection.c connection.h)
 
 SET(GCC_COVERAGE_LINK_FLAGS "-lws2_32")
 
