@@ -122,8 +122,8 @@ int main()
     cout << "For information use --help!" << endl;
 
     //Obtain id from server for this client;
-    /*recv(client.socket, client.received_message, DEFAULT_BUFLEN, 0);
-    client.id = (int)client.received_message;*/
+    recv(client.socket, client.received_message, DEFAULT_BUFLEN, 0);
+    client.id = (int)client.received_message;
 
     string specialMsg;
     recv(client.socket, client.received_message, DEFAULT_BUFLEN, 0);
@@ -138,6 +138,7 @@ int main()
 
         while (1)
         {
+            printf("User #%d> ", client.id);
             getline(cin, sent_message);
             if (!sent_message.empty()) {
                 int a, b, n;
@@ -200,8 +201,8 @@ void print_commands()
     printf("\t--lidarstop - stops the motor\n");
     printf("\t--lidarhealth - check lidar health (0-good, 1-warning, 2-error)\n");
     printf("\t--lidarreset - resets core\n");
-    printf("\t--lidarread n");
-    printf("\t--ultrasonicdisable");
+    printf("\t--lidarread \n");
+    printf("\t--ultrasonicdisable\n");
     /*printf("\t--lidarread_continous \n"); */
     /* TODO */
     /*printf("\t--motorforward <speed> <type>\n");

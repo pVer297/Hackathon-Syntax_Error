@@ -304,8 +304,8 @@ int main()
         {
             //Send the id to that client
             std::cout << "Client #" << client[temp_id].id << " Accepted" << std::endl;
-            /*msg = std::to_string(client[temp_id].id);
-            send(client[temp_id].socket, msg.c_str(), strlen(msg.c_str()), 0); */
+            msg = std::to_string(client[temp_id].id);
+            send(client[temp_id].socket, msg.c_str(), strlen(msg.c_str()), 0);
             //Rather send special welcome message
             std::string specialMsg =  "Welcome on the server #" + std::to_string(client[temp_id].port) + " !";
             send(client[temp_id].socket, specialMsg.c_str(), strlen(specialMsg.c_str()), 0);
