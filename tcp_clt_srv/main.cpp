@@ -123,7 +123,8 @@ int main()
 
     //Obtain id from server for this client;
     recv(client.socket, client.received_message, DEFAULT_BUFLEN, 0);
-    client.id = (int)client.received_message;
+    message = client.received_message;
+    client.id = atoi(client.received_message);
 
     string specialMsg;
     recv(client.socket, client.received_message, DEFAULT_BUFLEN, 0);
@@ -132,13 +133,11 @@ int main()
 
     if (message != "Server is full")
     {
-        client.id = atoi(client.received_message);
-
         thread my_thread(process_client, ref(client));
 
         while (1)
         {
-            printf("User #%d> ", client.id);
+            printf("Client %d>", client.id);
             getline(cin, sent_message);
             if (!sent_message.empty()) {
                 int a, b, n;

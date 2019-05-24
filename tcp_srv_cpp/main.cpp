@@ -176,7 +176,7 @@ int process_client(client_type &new_client, std::vector<client_type> &client_arr
                         }
                     }
 
-                msg = "Client #" + std::to_string(new_client.port) + ": " + tempmsg;
+                msg = "Client #" + std::to_string(new_client.id) + ": " + tempmsg;
 
                 std::cout << msg.c_str() << std::endl;
 
@@ -190,7 +190,7 @@ int process_client(client_type &new_client, std::vector<client_type> &client_arr
             }
             else
             {
-                msg = "Client #" + std::to_string(new_client.port) + " Disconnected";
+                msg = "Client #" + std::to_string(new_client.id) + " Disconnected";
 
                 std::cout << msg << std::endl;
 
