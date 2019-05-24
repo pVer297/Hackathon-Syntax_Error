@@ -137,7 +137,6 @@ int main()
 
         while (1)
         {
-            printf("Client %d>", client.id);
             getline(cin, sent_message);
             if (!sent_message.empty()) {
                 int a, b, n;
