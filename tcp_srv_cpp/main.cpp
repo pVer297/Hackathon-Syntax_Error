@@ -13,6 +13,8 @@
 #define DEFAULT_PORT "8080"
 #define DEFAULT_BUFLEN 512
 
+HANDLE hCom;
+
 struct client_type
 {
     int id;
@@ -21,12 +23,76 @@ struct client_type
 };
 
 const char OPTION_VALUE = 1;
-const int MAX_CLIENTS = 5;
+const int MAX_CLIENTS = 10;
 
 //Function Prototypes
 int process_client(client_type &new_client, std::vector<client_type> &client_array, std::thread &thread);
 int main();
+void process_uart()
+{
+    DCB dcb={0};
+    BOOL fSuccess;
+    char *pcCommPort = "COM10";
 
+/***************************************CommTimeouts******************************************/
+    COMMTIMEOUTS timeouts={0};
+    timeouts.ReadIntervalTimeout=50;
+    timeouts.ReadTotalTimeoutConstant=50;
+    timeouts.ReadTotalTimeoutMultiplier=10;
+    timeouts.WriteTotalTimeoutConstant=50;
+    timeouts.WriteTotalTimeoutMultiplier=10;
+
+
+
+
+/*******************************************Handle*******************************************/
+    LPCTSTR pcCommPortWin32DevicePath = TEXT("\\\\.\\COM10");
+    hCom = CreateFile( pcCommPortWin32DevicePath,
+                       GENERIC_READ | GENERIC_WRITE,
+                       FILE_SHARE_READ,    // must be opened with exclusive-access
+                       NULL, // no security attributes
+                       OPEN_EXISTING, // must use OPEN_EXISTING
+                       FILE_ATTRIBUTE_NORMAL,    // not overlapped I/O
+                       NULL  // hTemplate must be NULL for comm devices
+    );
+
+/***************************************SET*UP*COM*PORT**************************************/
+    if (hCom == INVALID_HANDLE_VALUE)
+    {
+        printf ("CreateFile failed with error %d.\n", GetLastError());
+        return ;
+    }
+
+    if(!SetCommTimeouts(hCom, &timeouts))
+    {
+        /*Well, then an error occurred*/
+    }
+
+    fSuccess = GetCommState(hCom, &dcb);
+
+    if (!fSuccess)
+    {
+        /*More Error Handling*/
+        printf ("GetCommState failed with error %d.\n", GetLastError());
+        return ;
+    }
+
+
+    dcb.BaudRate = 115200;     // set the baud rate
+    dcb.ByteSize = 8;             // data size, xmit, and rcv
+    dcb.Parity = NOPARITY;        // no parity bit
+    dcb.StopBits = ONESTOPBIT;    // one stop bit
+    dcb.EofChar = 0x00;
+    fSuccess = SetCommState(hCom, &dcb);
+
+    if (!fSuccess)
+    {
+        printf ("SetCommState failed. Error: %d.\n", GetLastError());
+        return ;
+    }
+
+    printf ("Serial port %s successfully configured.\n", pcCommPort);
+}
 int process_client(client_type &new_client, std::vector<client_type> &client_array, std::thread &thread)
 {
     std::string msg = "";
@@ -50,10 +116,67 @@ int process_client(client_type &new_client, std::vector<client_type> &client_arr
         {
             int iResult = recv(new_client.socket, tempmsg, DEFAULT_BUFLEN, 0);
 
-            if (iResult > 0)
-            {
+            if (iResult > 0) {
+
+
                 if (strcmp("", tempmsg))
-                    msg = "Client #" + std::to_string(new_client.port) + ": " + tempmsg;
+                    if (stricmp(tempmsg, "--lidarstart") == 0) {
+                        char buff[40] = "lidar start";
+                        DWORD dwBytesWrite = 0;
+                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
+                            int i = 0;
+                            for (i = 0; i < sizeof(buff); i++) {
+                                printf("%c", buff[i]);
+                            }
+                        }
+                    } else if (stricmp(tempmsg, "--lidarstop") == 0) {
+                        char buff[40] = "lidar stop";
+                        DWORD dwBytesWrite = 0;
+                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
+                            int i = 0;
+                            for (i = 0; i < sizeof(buff); i++) {
+                                printf("%c", buff[i]);
+                            }
+                        }
+                    } else if (stricmp(tempmsg, "--lidarhealth") == 0) {
+                        char buff[40] = "lidar health";
+                        DWORD dwBytesWrite = 0;
+                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
+                            int i = 0;
+                            for (i = 0; i < sizeof(buff); i++) {
+                                printf("%c", buff[i]);
+                            }
+                        }
+                    } else if (stricmp(tempmsg, "--lidarread") == 0) {
+                        char buff[40] = "lidar read_single 0 0";
+                        DWORD dwBytesWrite = 0;
+                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
+                            int i = 0;
+                            for (i = 0; i < sizeof(buff); i++) {
+                                printf("%c", buff[i]);
+                            }
+                        }
+                    } else if (stricmp(tempmsg, "--lidarreset") == 0) {
+                        char buff[40] = "lidar reset";
+                        DWORD dwBytesWrite = 0;
+                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
+                            int i = 0;
+                            for (i = 0; i < sizeof(buff); i++) {
+                                printf("%c", buff[i]);
+                            }
+                        }
+                    } else if (stricmp(tempmsg, "--ultrasonicdisable") == 0) {
+                        char buff[40] = "ultrasonic disable all";
+                        DWORD dwBytesWrite = 0;
+                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
+                            int i = 0;
+                            for (i = 0; i < sizeof(buff); i++) {
+                                printf("%c", buff[i]);
+                            }
+                        }
+                    }
+
+                msg = "Client #" + std::to_string(new_client.port) + ": " + tempmsg;
 
                 std::cout << msg.c_str() << std::endl;
 
@@ -92,6 +215,9 @@ int process_client(client_type &new_client, std::vector<client_type> &client_arr
 
 int main()
 {
+    std::thread my_uart;
+    my_uart = std::thread(process_uart);
+
     WSADATA wsaData;
     struct addrinfo hints;
     struct addrinfo *server = NULL;
