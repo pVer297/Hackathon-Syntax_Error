@@ -14,6 +14,7 @@ int main(int argc, char* argv[])
         puts("Using default port: <47698>");
         memcpy(port, DEFAULT_PORT, 6);
     } else {
+        printf("Opening port at: <%s>", argv[1]);
         memcpy(port, argv[1], 6);
     }
     if (!WSA_config(2, 2)) {

@@ -9,7 +9,6 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-#define SERVER_PORT "47698"
 #define BUFF_LEN 2048
 
 uint8_t WSA_config(uint8_t major_ver, uint8_t minor_ver);
