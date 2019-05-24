@@ -1,5 +1,5 @@
-#ifndef CLIENT_TCP_PLAINTE_SOCKET2019_H
-#define CLIENT_TCP_PLAINTE_SOCKET2019_H
+#ifndef CLIENT_TCP_SOCKET19_H
+#define CLIENT_TCP_SOCKET19_H
 
 #include <stdio.h>
 #include <ws2tcpip.h>
@@ -13,12 +13,13 @@
 #define IP_ADDRESS "10.27.6.113"
 #define PORT 47698
 
-int create_client();
 int create_socket(SOCKET socket);
 int start_wsa();
 int connect_sck(SOCKET socket, struct sockaddr_in client);
 int send_and_receive_data(SOCKET socket);
 int close_sck(SOCKET socket);
-int exit_command(int* username, char* user_input, char* usr_name);
 
-#endif //CLIENT_TCP_PLAINTE_SOCKET2019_H
+void clear_up();
+void print_commands();
+
+#endif //CLIENT_TCP_SOCKET19_H
