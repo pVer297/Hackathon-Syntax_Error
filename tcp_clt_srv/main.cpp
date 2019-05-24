@@ -195,12 +195,14 @@ void print_commands()
     printf("\t--help -check all commands\n");
     printf("\t--exit -disconnect from the server\n");
     printf("\t--clear -clears window\n");
-    printf("\t--lidarstart - start the motor\n");
-    printf("\t--lidarstop - stops the motor\n");
-    printf("\t--lidarhealth - check lidar health (0-good, 1-warning, 2-error)\n");
-    printf("\t--lidarreset - resets core\n");
-    printf("\t--lidarread \n");
-    printf("\t--ultrasonicdisable\n");
+    printf("\tlidar start - start the motor\n");
+    printf("\tlidar stop - stops the motor\n");
+    printf("\tlidar health - check lidar health (0-good, 1-warning, 2-error)\n");
+    printf("\tlidar reset - resets core\n");
+    printf("\tlidar read_single <value1> <value2> \n");
+    printf("\tultrarsonic disable all\n");
+    printf("\tservo left 100 0\n");
+    printf("\t ....and so many");
     /*printf("\t--lidarread_continous \n"); */
     /* TODO */
     /*printf("\t--motorforward <speed> <type>\n");
