@@ -119,73 +119,24 @@ int process_client(client_type &new_client, std::vector<client_type> &client_arr
             if (iResult > 0) {
 
 
-                if (strcmp("", tempmsg))
-                    if (stricmp(tempmsg, "--lidarstart") == 0) {
-                        char buff[40] = "lidar start";
-                        DWORD dwBytesWrite = 0;
-                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
-                            int i = 0;
-                            for (i = 0; i < sizeof(buff); i++) {
-                                printf("%c", buff[i]);
-                            }
-                        }
-                    } else if (stricmp(tempmsg, "--lidarstop") == 0) {
-                        char buff[40] = "lidar stop";
-                        DWORD dwBytesWrite = 0;
-                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
-                            int i = 0;
-                            for (i = 0; i < sizeof(buff); i++) {
-                                printf("%c", buff[i]);
-                            }
-                        }
-                    } else if (stricmp(tempmsg, "--lidarhealth") == 0) {
-                        char buff[40] = "lidar health";
-                        DWORD dwBytesWrite = 0;
-                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
-                            int i = 0;
-                            for (i = 0; i < sizeof(buff); i++) {
-                                printf("%c", buff[i]);
-                            }
-                        }
-                    } else if (stricmp(tempmsg, "--lidarread") == 0) {
-                        char buff[40] = "lidar read_single 0 0";
-                        DWORD dwBytesWrite = 0;
-                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
-                            int i = 0;
-                            for (i = 0; i < sizeof(buff); i++) {
-                                printf("%c", buff[i]);
-                            }
-                        }
-                    } else if (stricmp(tempmsg, "--lidarreset") == 0) {
-                        char buff[40] = "lidar reset";
-                        DWORD dwBytesWrite = 0;
-                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
-                            int i = 0;
-                            for (i = 0; i < sizeof(buff); i++) {
-                                printf("%c", buff[i]);
-                            }
-                        }
-                    } else if (stricmp(tempmsg, "--ultrasonicdisable") == 0) {
-                        char buff[40] = "ultrasonic disable all";
-                        DWORD dwBytesWrite = 0;
-                        if (WriteFile(hCom, buff, 39, &dwBytesWrite, NULL)) {
-                            int i = 0;
-                            for (i = 0; i < sizeof(buff); i++) {
-                                printf("%c", buff[i]);
-                            }
+                if (strcmp("", tempmsg)) {
+                    DWORD dwBytesWrite = 0;
+                    if (WriteFile(hCom, tempmsg, strlen(tempmsg), &dwBytesWrite, NULL)) {
+                        int i = 0;
+                        for (i = 0; i < sizeof(tempmsg); i++) {
+                            printf("%c", tempmsg[i]);
                         }
                     }
+                    msg = "Client #" + std::to_string(new_client.id) + ": " + tempmsg;
 
-                msg = "Client #" + std::to_string(new_client.id) + ": " + tempmsg;
+                    std::cout << msg.c_str() << std::endl;
 
-                std::cout << msg.c_str() << std::endl;
-
-                //Broadcast that message to the other clients
-                for (int i = 0; i < MAX_CLIENTS; i++)
-                {
-                    if (client_array[i].socket != INVALID_SOCKET)
-                        if (new_client.id != i)
-                            iResult = send(client_array[i].socket, msg.c_str(), strlen(msg.c_str()), 0);
+                    //Broadcast that message to the other clients
+                    for (int i = 0; i < MAX_CLIENTS; i++) {
+                        if (client_array[i].socket != INVALID_SOCKET)
+                            if (new_client.id != i)
+                                iResult = send(client_array[i].socket, msg.c_str(), strlen(msg.c_str()), 0);
+                    }
                 }
             }
             else
