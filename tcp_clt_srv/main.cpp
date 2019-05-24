@@ -195,16 +195,17 @@ void print_commands()
     printf("Please find below all the available commands:\n");
     printf("\t--help -check all commands\n");
     printf("\t--exit -disconnect from the server\n");
-    printf("\t--clear -clearas window\n");
-    printf("\t--username <new_username> -change username\n");
-    printf("\t--lidar start - start the motor\n");
-    printf("\t--lidar stop - stops the motor\n");
-    printf("\t--lidar health - check lidar health (0-good, 1-warning, 2-error)\n");
-    printf("\t--lidar reset - resets core\n");
-    printf("\t--lidar read_single <angle1> <angle2> (value can be 0-360)\n");
-    printf("\t--lidar read_continous <angle1> <angle2> (value can be 0-360)\n");
-    printf("\t--motor forward <speed> <type>\n");
-    printf("\t--motor backward <speed> <type>\n");
-    printf("\t--servo turn_left <value1> <value2> (value can be 0-100, 0 0-> reset)\n");
-    printf("\t--servo turn_right <value1> <value2> (value can be 0-100, 0 0-> reset)\n");
+    printf("\t--clear -clears window\n");
+    printf("\t--lidarstart - start the motor\n");
+    printf("\t--lidarstop - stops the motor\n");
+    printf("\t--lidarhealth - check lidar health (0-good, 1-warning, 2-error)\n");
+    printf("\t--lidarreset - resets core\n");
+    printf("\t--lidarread n");
+    printf("\t--ultrasonicdisable");
+    /*printf("\t--lidarread_continous \n"); */
+    /* TODO */
+    /*printf("\t--motorforward <speed> <type>\n");
+    printf("\t--motorbackward <speed> <type>\n");
+    printf("\t--servoturn_left <value1> <value2> (value can be 0-100, 0 0-> reset)\n");
+    printf("\t--servoturn_right <value1> <value2> (value can be 0-100, 0 0-> reset)\n");*/
 }
