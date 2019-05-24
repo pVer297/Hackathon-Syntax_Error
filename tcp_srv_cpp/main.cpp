@@ -290,7 +290,7 @@ int main()
                 char buf[30];
                 client[i].socket = incoming;
                 client[i].id = i;
-                client[i].port = (int)service;
+                client[i].port = atoi(service);
                 temp_id = i;
             }
 
@@ -307,7 +307,7 @@ int main()
             msg = std::to_string(client[temp_id].id);
             send(client[temp_id].socket, msg.c_str(), strlen(msg.c_str()), 0);
             //Rather send special welcome message
-            std::string specialMsg =  "Welcome on the server #" + std::to_string(client[temp_id].port) + " !";
+            std::string specialMsg =  "\nWelcome on the server #" + std::to_string(client[temp_id].id) + " !";
             send(client[temp_id].socket, specialMsg.c_str(), strlen(specialMsg.c_str()), 0);
 
             //Create a thread process for that client
