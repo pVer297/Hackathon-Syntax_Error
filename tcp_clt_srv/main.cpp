@@ -1,0 +1,210 @@
+#define _WIN32_WINNT  0x501
+
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <iostream>
+#include <string>
+#include <thread>
+#include "string.h"
+
+using namespace std;
+
+#pragma comment (lib, "Ws2_32.lib")
+
+#define DEFAULT_BUFLEN 512
+#define IP_ADDRESS "10.27.6.127"
+#define DEFAULT_PORT "8080"
+
+struct client_type
+{
+    SOCKET socket;
+    int id;
+    char received_message[DEFAULT_BUFLEN];
+};
+
+int process_client(client_type &new_client);
+int main();
+void clear_up();
+void print_commands();
+
+int process_client(client_type &new_client)
+{
+    while (true)
+    {
+        memset(new_client.received_message, 0, DEFAULT_BUFLEN);
+
+        if (new_client.socket != 0)
+        {
+            int iResult = recv(new_client.socket, new_client.received_message, DEFAULT_BUFLEN, 0);
+
+            if (iResult != SOCKET_ERROR)
+                cout << new_client.received_message << endl;
+            else
+            {
+                cout << "recv() failed: " << WSAGetLastError() << endl;
+                break;
+            }
+        }
+    }
+
+    if (WSAGetLastError() == WSAECONNRESET)
+        cout << "The server has disconnected" << endl;
+    return 0;
+}
+
+int main()
+{
+    WSAData wsa_data;
+    struct addrinfo *result = NULL, *ptr = NULL, hints;
+    string sent_message = "";
+    client_type client = { INVALID_SOCKET, -1, "" };
+    int iResult = 0;
+    string message;
+
+    cout << "Starting Client...\n";
+
+    // Initialize Winsock
+    iResult = WSAStartup(MAKEWORD(2, 2), &wsa_data);
+    if (iResult != 0) {
+        cout << "WSAStartup() failed with error: " << iResult << endl;
+        return 1;
+    }
+
+    ZeroMemory(&hints, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+
+    cout << "Connecting...\n";
+
+    // Resolve the server address and port
+    iResult = getaddrinfo(static_cast<LPCTSTR>(IP_ADDRESS), DEFAULT_PORT, &hints, &result);
+    if (iResult != 0) {
+        cout << "getaddrinfo() failed with error: " << iResult << endl;
+        WSACleanup();
+        system("pause");
+        return 1;
+    }
+
+    // Attempt to connect to an address until one succeeds
+    for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
+
+        // Create a SOCKET for connecting to server
+        client.socket = socket(ptr->ai_family, ptr->ai_socktype,
+                               ptr->ai_protocol);
+        if (client.socket == INVALID_SOCKET) {
+            cout << "socket() failed with error: " << WSAGetLastError() << endl;
+            WSACleanup();
+            system("pause");
+            return 1;
+        }
+
+        // Connect to server.
+        iResult = connect(client.socket, ptr->ai_addr, (int)ptr->ai_addrlen);
+        if (iResult == SOCKET_ERROR) {
+            closesocket(client.socket);
+            client.socket = INVALID_SOCKET;
+            continue;
+        }
+        break;
+    }
+
+    freeaddrinfo(result);
+
+    if (client.socket == INVALID_SOCKET) {
+        cout << "Unable to connect to server!" << endl;
+        WSACleanup();
+        system("pause");
+        return 1;
+    }
+
+    cout << "Successfully Connected" << endl;
+    cout << "For information use --help!" << endl;
+
+    //Obtain id from server for this client;
+    /*recv(client.socket, client.received_message, DEFAULT_BUFLEN, 0);
+    client.id = (int)client.received_message;*/
+
+    string specialMsg;
+    recv(client.socket, client.received_message, DEFAULT_BUFLEN, 0);
+    specialMsg = client.received_message;
+    std::cout << specialMsg << std::endl;
+
+    if (message != "Server is full")
+    {
+        client.id = atoi(client.received_message);
+
+        thread my_thread(process_client, ref(client));
+
+        while (1)
+        {
+            getline(cin, sent_message);
+            if (!sent_message.empty()) {
+                int a, b, n;
+                n = sent_message.find("--help");
+                a = sent_message.find("--exit");
+                b = sent_message.find("--clear");
+                if (n != string::npos) {
+                    print_commands();
+                    continue;
+                } else if (a != string::npos) {
+                    break;
+                } else if (b != string::npos) {
+                    clear_up();
+                    continue;
+                } else {
+                    iResult = send(client.socket, sent_message.c_str(), strlen(sent_message.c_str()), 0);
+                    if (iResult <= 0) {
+                        cout << "send() failed: " << WSAGetLastError() << endl;
+                        break;
+                    }
+                }
+            }
+        }
+
+        //Shutdown the connection since no more data will be sent
+        my_thread.detach();
+    }
+    else
+        cout << client.received_message << endl;
+
+    cout << "Shutting down socket..." << endl;
+    iResult = shutdown(client.socket, SD_SEND);
+    if (iResult == SOCKET_ERROR) {
+        cout << "shutdown() failed with error: " << WSAGetLastError() << endl;
+        closesocket(client.socket);
+        WSACleanup();
+        system("pause");
+        return 1;
+    }
+
+    closesocket(client.socket);
+    WSACleanup();
+    system("pause");
+    return 0;
+}
+
+void clear_up()
+{
+    system("@cls||clear");
+}
+
+void print_commands()
+{
+    clear_up();
+    printf("Please find below all the available commands:\n");
+    printf("\t--help -check all commands\n");
+    printf("\t--exit -disconnect from the server\n");
+    printf("\t--clear -clearas window\n");
+    printf("\t--username <new_username> -change username\n");
+    printf("\t--lidar start - start the motor\n");
+    printf("\t--lidar stop - stops the motor\n");
+    printf("\t--lidar health - check lidar health (0-good, 1-warning, 2-error)\n");
+    printf("\t--lidar reset - resets core\n");
+    printf("\t--lidar read_single <angle1> <angle2> (value can be 0-360)\n");
+    printf("\t--lidar read_continous <angle1> <angle2> (value can be 0-360)\n");
+    printf("\t--motor forward <speed> <type>\n");
+    printf("\t--motor backward <speed> <type>\n");
+    printf("\t--servo turn_left <value1> <value2> (value can be 0-100, 0 0-> reset)\n");
+    printf("\t--servo turn_right <value1> <value2> (value can be 0-100, 0 0-> reset)\n");
+}
